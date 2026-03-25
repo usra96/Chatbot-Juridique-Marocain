@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+**/build
+**/.git
+**/.github
+**/.env
+**/vector_store.json
+chatbot-juridique/frontend

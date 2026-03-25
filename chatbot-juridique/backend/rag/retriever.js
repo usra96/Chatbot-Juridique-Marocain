@@ -4,6 +4,9 @@ const { VectorStore } = require('./vectorStore');
 
 const MAX_CONTEXT_CHARS = 1500;
 const TOP_K = 3;
+const FORCE_REBUILD = (process.env.FORCE_REBUILD_VECTOR_STORE || 'true')
+  .toLowerCase()
+  .trim() === 'true';
 
 const KEYWORD_FILTERS = [
   {
@@ -77,20 +80,26 @@ function truncate(text, maxLength = 200) {
 async function buildOrLoadVectorStore() {
   if (!storeInstance) storeInstance = new VectorStore();
 
-  const loaded = storeInstance.loadFromDisk();
   const currentSignatures = getPdfSignatures();
 
-  if (loaded) {
-    const sameModel = storeInstance.meta.embeddingModel === EMBEDDING_MODEL;
-    const sameSources =
-      JSON.stringify(storeInstance.meta.sources || {}) === JSON.stringify(currentSignatures);
+  if (!FORCE_REBUILD) {
+    const loaded = storeInstance.loadFromDisk();
 
-    if (sameModel && sameSources && storeInstance.documents.length > 0) {
-      console.log('📦 Vector store charge depuis le disque');
-      return storeInstance;
+    if (loaded) {
+      const sameModel = storeInstance.meta.embeddingModel === EMBEDDING_MODEL;
+      const sameSources =
+        JSON.stringify(storeInstance.meta.sources || {}) === JSON.stringify(currentSignatures);
+
+      if (sameModel && sameSources && storeInstance.documents.length > 0) {
+        console.log('📦 Vector store charge depuis le disque');
+        return storeInstance;
+      }
+
+      console.log('🔄 Changement detecte, reconstruction du vector store...');
+      storeInstance.clear();
     }
-
-    console.log('🔄 Changement detecte, reconstruction du vector store...');
+  } else {
+    console.log('♻️ Reconstruction forcee du vector store');
     storeInstance.clear();
   }
 
