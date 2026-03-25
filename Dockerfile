@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Installer les dependances backend
 COPY chatbot-juridique/backend/package*.json ./backend/
-RUN cd backend && npm ci --only=production
+RUN cd backend && npm ci --omit=dev
 
 # Copier le code backend et les donnees PDF
 COPY chatbot-juridique/backend ./backend
