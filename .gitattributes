@@ -1,0 +1,1 @@
+chatbot-juridique/backend/rag/vector_store.json filter=lfs diff=lfs merge=lfs -text
