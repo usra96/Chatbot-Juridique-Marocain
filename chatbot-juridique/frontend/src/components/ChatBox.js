@@ -4,6 +4,22 @@ import './ChatBox.css';
 const API_URL = 'http://localhost:3000/chat';
 const API_STREAM_URL = 'http://localhost:3000/chat/stream';
 
+function formatNumberedList(text) {
+  if (!text) return text;
+  let output = text.replace(/\r\n/g, '\n');
+
+  // Corrige les doublons du type "3. ."
+  output = output.replace(/\b(\d+)\.\s*\.\s*/g, '$1. ');
+
+  // Force un saut de ligne avant chaque numero (1., 2., 3., 4.)
+  output = output.replace(/([^\n])(\b[1-4]\.\s)/g, '$1\n$2');
+
+  // Normalise les formats "1)" ou "1 -"
+  output = output.replace(/\b([1-4])\s*[)\-]\s*/g, '$1. ');
+
+  return output.replace(/\n{2,}/g, '\n').trim();
+}
+
 function ChatBox() {
   const [messages, setMessages] = useState([
     {
@@ -37,6 +53,7 @@ function ChatBox() {
     setLoading(true);
     setError('');
 
+    let streamFailed = false;
     try {
       const response = await fetch(API_STREAM_URL, {
         method: 'POST',
@@ -79,6 +96,7 @@ function ChatBox() {
         });
       }
     } catch (err) {
+      streamFailed = true;
       setError('Erreur serveur');
       setMessages((prev) =>
         prev.map((msg) =>
@@ -88,6 +106,13 @@ function ChatBox() {
         )
       );
     } finally {
+      if (!streamFailed) {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botId ? { ...msg, content: formatNumberedList(msg.content) } : msg
+          )
+        );
+      }
       setLoading(false);
     }
   };
