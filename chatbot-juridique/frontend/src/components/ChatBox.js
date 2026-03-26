@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './ChatBox.css';
 
-const API_URL = 'http://localhost:3000/chat';
-const API_STREAM_URL = 'http://localhost:3000/chat/stream';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/chat';
+const API_STREAM_URL =
+  process.env.REACT_APP_API_STREAM_URL || 'http://localhost:3000/chat/stream';
 
 function formatNumberedList(text) {
   if (!text) return text;
