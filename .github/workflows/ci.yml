@@ -47,5 +47,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/chatbot-juridique-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}chatbot-juridique-backend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/chatbot-juridique-backend:${{ github.sha }}
